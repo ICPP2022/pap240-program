@@ -12,7 +12,7 @@ CFLAGS = -O2
 #Source code files, Object files and Target(Executable) file defeine
 SRCS = $(wildcard src_*.f90)
 OBJS = $(SRCS:.f90=.o)
-TARGET = misascd
+TARGET = misaslscd
 
 MODSRCS =   mod_structuretype.f90\
             mod_constants.f90\
