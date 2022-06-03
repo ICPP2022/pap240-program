@@ -1,0 +1,407 @@
+!***************************************************************************************************
+!************************************DEFECT ATTRIBUTES**********************************************
+!This is the input file for Fe-Cu alloy, includes:
+! 1) Component species: defectType(SPECIES), default: SPECIES = 3
+!               defectType(1): number of self defects (ndef, if <0 vacancies, if >0 SIAs) Fe or W
+!               defectType(2): number of solute atoms (Cu/Cr) or volatile products (He/Re).
+!               defectType(3): number of gas atoms atoms (He/H)
+!               default: LEVELS = 8 (2^SPECIES)
+!               level = 1: SIAs
+!               level = 2: Vs
+!               level = 3: pure cluster (0 n 0)
+!               level = 4: pure cluster (0 0 n)
+!               level = 5: complex cluster (n m 0)
+!               level = 6: complex cluster (n 0 m)
+!               level = 7: complex cluster (0 n m)
+!               level = 8: complex cluster (n m k)
+! 2) Formation energies of point defects (Ef)
+! 3) Diffusion parameters of mobile defects (D0 and Em)
+! 4) Binding energies of clusters
+!    NOTE: defects with multiple species (eg. V_nS_m), need binding energies of each species allowed to dissociate (single S or single V).
+! 5) List of allowed reactions for each defect species and functional form of reaction rate, including 0th, 1th and 2th
+!    0th:        implantation (cascade or Fenkel pairs)
+!    1th:        dissociation
+!                sinkRemoval (absorption at sinks, include dislocation and grain boundary, sink strength: S=Sd+Sg)
+!                diffusion
+!    2th:        clustering
+! 6) Identify the function form with ftype, including:
+!    6a)ftype   1~10 are used to calculate diffusivities
+!               1: immobile (0 parameters)
+!               2: constant (1 parameters)
+!               3: mobile SIA loops (6 parameters)
+!               4: mobile solute clusters (Cu) (2 parameters: D0 and Em of Cu monomer, D(n)=D(1)/n)
+!    6b)ftype   11~20 are used to calculate binding energies
+!               11: constant (1 parameters)
+!               12: Eb of SIA/V clusters (2 parameters: Eb(2) and Ef(1))
+!               13: Eb of Cun->Cu+Cu(n-1) (3 parameters: Christien F and Barbu A. (2004))
+!               14: Eb of VmCun->Cu+VmCu(n-1)) (3 parameters: Kulikov § D, Malerba L and Hou M. (2006))
+!               15: Eb of VmCun->V+V(m-1)Cun (4 parameters: Kulikov § D, Malerba L and Hou M. (2006))
+! 7) Reaction type, including:
+!    7a) 1~10 are used for 0th reaction, including:
+!               1: Frenkel pair
+!               2: cascade
+!               3: He
+!               4: Re
+!               5: H
+!    7b) 11~20 are used for 1th reaction ,including:
+!               11: dissociation
+!               12: sinkRemoval
+!               13: diffusion (3D diffusion)
+!    7c) 21~30 are used for 2th reaction, including:
+!               21: 3D-3D
+!               22: 3D-1D
+!               23: 1D-1D
+!***************************************************************************************************
+!***************************************************************************************************
+
+!***************************************************************************************************
+formationEnergies           !<List of formation energies (eV)
+
+numSingle
+3
+
+1	0   0
+Ef  4.3d0                   !I1
+-1	0   0
+Ef  1.6d0                   !V1
+0	1   0
+Ef  1.77d0                  !S1
+
+diffusivities               !<List of diffusion prefactors D0 (nm^2/s), and migration energies Em (eV)
+
+numSingle
+3
+
+1	0   0                   !I1
+D0  4.0d10  Em  0.3d0
+-1	0   0                   !V1
+D0  1.0d14  Em	1.30d0
+0	1   0                   !S1
+D0  1.575d21  Em  2.29d0      !D0=D0_Cu*firr (D0_Cu=6.3d13), firr is radiation enhanced factor (=Vconcent/initialCeqv, 2.5d7)
+
+numFunction
+4
+
+1	0   0	                !In(n>=2)  immobile
+min 2   0   0
+max -1  0   0               !-1 means infinity
+fType	1
+param	0
+
+-1	0   0				    !Vn(n>=2) immobile
+min 2   0   0
+max -1  0   0
+fType	1
+param	0
+
+0	1   0				    !Sn(n>=2) immobile
+min 0   2   0
+max 0   -1  0
+fType	1
+param	0
+
+-1	1   0	                !SnVm  immobile
+min 1   1   0
+max -1  -1  0
+fType	1
+param	0
+
+!***************************************************************************************************
+bindingEnergies			        !<List of binding energies
+
+numSingle
+46
+
+2   0   0       1	0   0		!I2->I1+I1
+Eb  1.2d0
+3	0   0       1	0   0		!I3->I2+I1
+Eb  0.92d0
+-2	0   0		-1	0   0		!V2->V1+V1
+Eb  0.8d0
+-3	0   0		-1	0   0		!V3->V1+V2
+Eb  0.356d0
+-4	0   0		-1	0   0		!V4->V1+V3
+Eb  0.628d0
+-5	0	0	    -1	0   0		!V5->V1+V4
+Eb  0.627d0
+-6	0	0	    -1	0   0		!V6->V1+V5
+Eb  0.9d0
+-7	0   0		-1	0   0		!V7->V1+V6
+Eb  0.622d0
+-8	0   0		-1	0   0		!V8->V1+V7
+Eb  0.894d0
+-9	0   0		-1	0   0		!V9->V1+V8
+Eb  0.62d0
+-10	0   0		-1	0   0		!V10->V1+V9
+Eb  0.843d0
+-11	0   0		-1	0   0		!V11->V1+V10
+Eb  0.895d0
+-12	0   0		-1	0   0		!V12->V1+V11
+Eb  0.866d0
+-13	0   0		-1	0   0		!V13->V1+V12
+Eb  1.07d0
+-14 0   0		-1	0   0		!V14->V1+V13
+Eb  1.14d0
+-15	0   0		-1	0   0		!V15->V1+V14
+Eb  1.14d0
+-16	0   0		-1	0   0		!V16->V1+V15
+Eb  0.892d0
+0   2   0		0	1   0		!S2->S1+S1
+Eb  0.19d0
+-1	1   0		0	1   0	    !V1S1->S1+V1
+Eb  0.192d0
+-1	2   0		0	1   0	    !V1S2->S1+V1S1
+Eb  0.217d0
+-2	1   0       -1	0   0	    !V2S1->V1+V1S1
+Eb  0.401d0
+-3	1   0		-1	0   0	    !V3S1->V1+V2S1
+Eb  0.39d0
+-4	1   0		-1	0   0	    !V4S1->V1+V3S1
+Eb  0.524d0
+-5	1   0		-1	0   0	    !V5S1->V1+V4S1
+Eb  0.624d0
+-6	1   0		-1	0   0	    !V6S1->V1+V5S1
+Eb  0.9d0
+-1	2   0		-1	0   0	    !V1S2->V1+S2
+Eb  0.431d0
+-2	2   0		-1	0   0	    !V2S2->V1+V1S2
+Eb  0.576d0
+-3	2   0		-1	0   0	    !V3S2->V1+V2S2
+Eb  0.337d0
+-4	2   0		-1	0   0	    !V4S2->V1+V3S2
+Eb  0.564d0
+-5	2   0		-1	0   0	    !V5S2->V1+V4S2
+Eb  0.607d0
+-6	2   0		-1	0   0	    !V6S2->V1+V5S2
+Eb  0.904d0
+-1	3   0		-1	0   0	    !V1S3->V1+S3
+Eb  0.301d0
+-2	3   0		-1	0   0	    !V2S3->V1+V1S3
+Eb  0.498d0
+-3	3   0		-1	0   0	    !V3S3->V1+V2S3
+Eb  0.391d0
+-4	3   0		-1	0   0	    !V4S3->V1+V3S3
+Eb  0.541d0
+-5	3   0		-1	0   0	    !V5S3->V1+V4S3
+Eb  0.719d0
+-6	3   0		-1	0   0	    !V6S3->V1+V5S3
+Eb  0.898d0
+-1	4   0		-1	0   0	    !V1S4->V1+S4
+Eb  0.299d0
+-2	4   0		-1	0   0	    !V2S4->V1+V1S4
+Eb  0.301d0
+-3	4   0		-1	0   0	    !V3S4->V1+V2S4
+Eb  0.651d0
+-4	4   0		-1	0   0	    !V4S4->V1+V3S4
+Eb  0.587d0
+-5	4   0		-1	0   0	    !V5S4->V1+V4S4
+Eb  0.634d0
+-6	4   0		-1	0   0	    !V6S4->V1+V5S4
+Eb  0.827d0
+-1	5   0		-1	0   0	    !V1S5->V1+S5
+Eb  0.38d0
+-2	5   0		-1	0   0	    !V2S5->V1+V1S5
+Eb  0.451d0
+-3	5   0		-1	0   0	    !V3S5->V1+V2S5
+Eb  0.659d0
+
+numFunction
+8
+
+1   0   0       1	0   0		!In->I1+I(n-1)
+min 4   0   0
+max -1  0   0
+fType	12
+param	2
+4.3d0	1.2d0			        !parameters for functional form type 12 (only 2 parameters)
+
+-1	0   0	    -1	0   0	    !Vn->V1+V(n-1)
+min 17  0   0
+max -1  0   0
+fType	12
+param	2
+1.6d0	0.8d0
+
+0	1   0		0	1   0		!Cun->Cu1+Cu(n-1)
+min 0   3   0
+max 0   -1  0
+fType	13
+param	3
+6255d0	0.866d0 2.3125          !mixing enthalpy=6255kB (K), non-configurational entropy=0.866kB, interface energy (eV/nm2)
+
+-1	1   0		0	1   0		!VmCun->Cu1+VmCu(n-1)
+min 2   1   0
+max -1  -1  0
+fType	14
+param	3
+0.5d0	0.215d0 0.0004d0
+
+-1	1   0		0	1   0   	!VmCun->Cu1+VmCu(n-1)
+min 1   3   0
+max 1   -1  0
+fType   14
+param	3
+0.5d0	0.215d0 0.0004d0
+
+-1	1   0		-1	0   0		!VmCun->V1+V(m-1)Cun
+min 7   1   0
+max -1  -1  0
+fType	15
+param	4
+1.63d0	1.72d0	2.69d0  0.0004d0
+
+-1	1   0		-1	0   0	    !VmCun->V1+V(m-1)Cun
+min 1   6   0
+max 6   -1  0
+fType	15
+param	4
+1.63d0	1.72d0	2.69d0	0.0004d0
+
+-1	1   0		-1	0   0	    !VmCun->V1+V(m-1)Cun
+min 4   5   0
+max 6   5   0
+fType	15
+param	4
+1.63d0	1.72d0	2.69d0	0.0004d0
+
+!***************************************************************************************************
+!Reactions
+!***************************************************************************************************
+Implantation
+2				    !Reactions with no reactants (defect generation reactions)
+
+FrenkelPair					        !Frenkel pair implantation
+-1	0   0		1	0   0		    !V+SIA creation
+fType   1							!reactionRate form 2 - for Frenkel pair implantation
+
+Cascade						        !Cascade implantation
+fType   2							!reactionRate form 2 - for cascade implantation
+
+Dissociation
+6                   !Number of defect dissociation types
+
+1	0   0		1	0   0		    !In->I1+I(n-1)
+min 2   0   0
+max -1  0   0
+fType   11
+
+-1	0   0       -1	0   0		    !Vn->V1+V(n-1)
+min 2   0   0
+max -1  0   0
+fType   11
+
+0	1   0		0	1   0		    !Cun->Cu1+Cu(n-1)
+min 0   2   0
+max 0   -1  0
+fType   11
+
+-1	1   0		0	1   0		    !VmCun->Cu1+VmCu(n-1)
+min 1   1   0
+max -1  -1  0
+fType   11
+
+-1	1   0		-1	0   0		    !VmCun->V1+V(m-1)Cun
+min 2   1   0
+max -1  -1  0
+fType   11
+
+-1	1   0		0	1   0		    !VmCun->V1+V(m-1)Cun
+min 1   2   0
+max 1  -1  0
+fType   11
+
+SinkRemoval
+2					    !These reactions involve removing defects from the mesh by dislocations
+
+1	0   0					        !I1
+min 1   0   0
+max 1   0   0
+fType   12
+
+-1	0   0					        !V1
+min 1   0   0
+max 1   0   0
+fType   12
+
+Diffusion
+3					    !number of defect types that can diffuse
+
+1	0   0		1	0   0			!I1
+min 1   0   0
+max 1   0   0
+fType   13
+
+-1	0   0		-1	0   0			!V1
+min 1   0   0
+max 1   0   0
+fType   13
+
+0	1   0		0	1   0			!Cu diffusion
+min 0   1   0
+max 0   1   0
+fType   13
+
+Clustering
+12					    !number of different reactions allowed
+
+-1	0   0		-1	0   0			!V-V    3D-3D
+min 1   0   0       1   0   0
+max -1   0   0      -1   0   0
+fType   21
+
+0	1   0		0	1   0			!Cu-Cu  3D-3D
+min 0   1   0       0   1   0
+max 0   -1  0       0   -1  0
+fType   21
+
+0	1   0		-1	0   0			!Cu-V   3D-3D
+min 0   1   0       1   0   0
+max 0   -1  0       -1  0   0
+fType   21
+
+-1	1   0		0	1   0			!VCu-Cu 3D-3D
+min 1   1   0       0   1   0
+max -1  -1  0       0   -1  0
+fType   21
+
+-1	1   0		-1	0   0			!VCu-V  3D-3D
+min 1   1   0       1   0   0
+max -1  -1  0       -1  0   0
+fType   21
+
+-1	1   0		-1	1   0			!VCu-VCu    3D-3D
+min 1   1   0       1   1   0
+max -1  -1  0       -1  -1  0
+fType   21
+
+-1	0   0		1	0   0			!V-I_mobile (annihilation) 3D-3D SIA
+min 1   0   0       1   0   0
+max -1  0   0       1   0   0
+fType   21
+
+-1	0   0		1	0   0			!V-I_immobile (annihilation) (loop) 3D-1D SIA
+min 1   0   0       2   0   0
+max -1  0   0       -1  0   0
+fType   22
+
+-1	1   0		1	0   0			!VCu-I_mobile (annihilation) 3D-3D SIA
+min 1   1   0       1   0   0
+max -1  -1  0       1   0   0
+fType   21
+
+-1	1   0		1	0   0			!VCu-I_immobile (annihilation) 3D-1D SIA
+min 1   1   0       2   0   0
+max -1  -1  0       -1  0   0
+fType   22
+
+1	0   0       1	0   0			!small SIA_mobile clusters 3D-3D
+min 1   0   0       1   0   0
+max 1   0   0       1   0   0
+fType   21
+
+1	0   0		1	0   0			!3D-1D small SIA_mobile+SIA_immobile (leaves SIA_sessile)
+min 1   0   0       2   0   0
+max 1   0   0       -1  0   0
+fType   22
+
+

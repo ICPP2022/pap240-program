@@ -1,0 +1,186 @@
+!***************************************************************************************************
+!This is the first version of the overall parameters file that will be used for MISA-SCD.
+!It also contains filenames of various other input files used in this code.
+!***************************************************************************************************
+!>Toggles: Used to control the simulation process
+!***************************************************************************************************
+defectFile              !Location of the defect attributes file
+'../../inputs/Fe_Defects.txt'
+
+irradiationType         !('Cascade': neutron irradiation, 'FrenkelPair': electron irradiation, 'None': no irradiation)
+Cascade
+
+implantScheme           !('MonteCarlo' for MC cascade implantation, 'explicit' for explicit cascade implantation)
+MonteCarlo
+
+PKAspectrum             !('yes' or 'no') Whether to use the PKA spectrum
+no
+
+pkaFile                 !Location of the PKA spectrum file
+'../../inputs/pkas/'
+
+numCascadeFiles         !Number of cascade files
+1
+
+cascadeFile             !Location of the cascade file
+'../../inputs/cascades/Fe_20KeV_srscd.txt'
+
+implantType             !('uniform' or 'nonUniform') Implant defects uniformly or separately at each material point
+uniform
+
+implantFile             !Location of the file containing non-uniform implantation profile (implantType should be 'nonUniform')
+'../../inputs/dpas/[filename]'
+
+grainBoundaries	        !('yes' or 'no') Toggle whether or not we are going to include the effect of grain boundaries (Removing defects that travel too far)
+yes
+
+SIAPinToggle            !('yes' or 'no') Toggle whether or not allowing m_SIA loops to pin m_SIA loops
+yes
+
+HeSIAToggle             !('yes' or 'no') Toggle whether or not allow He-SIA clusters to form
+no
+
+!***************************************************************************************************
+!Simulation Parameters
+!
+!The order of these parameters can be adjusted but each parameter must come directly after the tag
+!for it. For example, the temperature must come directly after 'temperature'
+!***************************************************************************************************
+SimulationStart			!begin parameters
+
+temperature		        !Temperature, in K
+373d0
+
+soluteConc              !Initial content of Cu ( or Cr) in iron
+0d0
+
+MnContent               !Initial content of Mn
+0d0
+
+NiContent               !Initial content of Ni
+0d0
+
+SiContent               !Initial content of Si
+0d0
+
+PContent                !Initial content of P
+0d0
+
+initialVacancies        !The number of initial vacancies put in
+0
+
+dpaRate			        !NOTE: if the implant profile is non-uniform, this should be the AVERAGE DPA rate.
+1.0d-4
+
+totalDPA                !total DPA in simulation 1
+1.0d-2
+
+HeDPAratio              !Helium/DPA ratio. He ImplantRate (atomic fraction / sec) - only used if implantType='uniform'
+0d0                     !(NOTE: if implantType='nonUniform', must have HeDPAratio>0d0 to add nonuniform He implant rates)
+
+lattice                 !lattice constant (nm)  atomVol = lattice^3/2
+0.2867d0
+
+burgers                 !dislocation loop burgers vector (nm)
+0.287d0
+
+reactionRadius          !<Material parameter used for reaction distances (impacts reaction rates) (nm)
+0.65d0
+
+grainSize               !Mean free path for interstitial clusters to travel before removal (nm)
+1.0d3
+
+dislocDensity           !dislocation density (nm^-2)
+1d-5
+
+impurityDensity         !carbon impurity concentration (atomic fraction)
+0d0
+
+cascadeVolume           !volume of cascade (nm^3) - used for cascade-defect interactions
+1000d0			        
+
+max3D                   !maximum size for SIA defect to diffuse in 3D
+4
+
+numGrains               !Number of grains inside polycrystal (default 1)
+1
+
+numSims                 !number of times to repeat simulation
+1				        
+
+SimulationEnd		    !Tag for the end of the parameters file
+
+!***************************************************************************************************
+!Anneal parameters
+!***************************************************************************************************
+AnnealStart
+
+annealTime              !<Double precision. Annealing time (unit: s)
+0d0
+
+annealTemperature       !<Double precision. Initial temperature of annealing (unit: K).
+573d0
+
+annealType              !<('add' or 'mult') 'add': annealTemp += annealTempInc, 'mult': annealTemp *= annealTempInc
+add
+
+annealTempInc           !<Double precision. Increment time of annealing temperature (unit: K).
+0d0
+
+annealSteps             !<Integer. Total anneal steps.
+0
+
+AnnealEnd
+
+!***************************************************************************************************
+!Output parameters
+!***************************************************************************************************
+OutputStart
+
+totdatToggle    !‘yes’ or ‘no’: toggles output of totdat.txt file
+yes
+
+defectToggle    !'yes' or 'no', used to toggle whether we output the defect.out data file
+no
+
+stadatToggle    !'yes' or 'no', used to toggle whether we output the stadat.out data file
+no
+
+vtkToggle       !'yes' or 'no', used to toggle whether we output the .vtk file
+no
+
+minLoop         !Only n>minLoop 0_0_nI clusters are used for calculating the average cluster radius and number density
+10
+
+minVoid         !Only n>minVoid nV_0_0 clusters are used for calculating the average cluster radius and number density
+10
+
+minS            !Only n>minS (V)_nS_0 clusters are used for calculating the average cluster radius and number density
+10
+
+minSV           !Only (n+m)>minSV nV_mS_0 clusters are used for calculating the average cluster radius and number density
+10
+
+minBubble       !Only n>minBubble (V)_nHe_0 clusters are used for calculating the average cluster radius and number density
+2
+
+OutputEnd       !Tag for the end of the Output parameters file
+
+!***************************************************************************************************
+!Mesh parameters
+!***************************************************************************************************
+MeshStart		!<Begin fine mesh parameters
+
+length          !<Double precision. Length of one mesh (nm)
+10d0
+
+numx            !<Integer. Number of meshes in x-direction
+40
+
+numy            !<Integer. Number of meshes in y-direction
+30
+
+numz            !<Integer. Number of meshes in z-direction
+20
+
+MeshEnd			!<The end of meshing parameters
